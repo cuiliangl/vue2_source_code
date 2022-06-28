@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="../../dist/vue.js"></script>
+  </head>
+  <body>
+    <div id="app"></div>
+  </body>
+</html>
+
+<script>
+  /**
+   * Vue Loader 会把我们编写的单文件组件编译成组件选项对象，模版编译成选项的render函数。这是Vue的编译时。
+   * 在运行时，会基于编译成的组件选析按钩子顺序执行，执行render函数生成VNode，在生成VNode过程中遇到组件继续递归解析执行
+   * VNode 和 组件实例是两个概念：
+   * 1. 组件实例是当前组件的上下文，包含了组件的父组件、子组件、数据属性、事件等
+   * 2. VNode 是DOM或组件的描述对象。
+   */
+</script>
+
+<script>
+  Vue.directive("focus", {
+    inserted(el) {
+      // console.log(el);
+      el.focus();
+    },
+  });
+
+  // uiChild 是 VueComponent的实例
+  const uiChild = Vue.component("ui-child", {
+    props: ["age"],
+    data() {
+      return {
+        count: 12,
+      };
+    },
+    // h 是 vm.$createElement
+    render(h) {
+      // console.log(this.$scopedSlots.default(this.age));
+
+      return h("div", { class: "child-class" }, [
+        h("h3", "inject： " + this.foo),
+        h("h2", "child"),
+        // 作用域插槽
+        h("slot", this.$scopedSlots.default(this.count)),
+        // 具名插槽
+        h("slot", { name: "footer" }, this.$slots.footer),
+      ]);
+    },
+    // inject: {
+    //   foo: {
+    //     from: "foo",
+    //     default: "child",
+    //   },
+    // },
+    inject: ["foo"],
+    created() {
+      // console.log("child created");
+    },
+  });
+  const template = `
+      <div>
+        <h1>{{age}}</h1>
+        <ui-child @cus-click="increment" @hook:created="handle" :age="age">
+          <span slot-scope="scope">插槽：{{scope}}</span>
+          <h2 slot="footer">命名插槽</h2>
+        </ui-child>
+        <h3>info: {{info}}</h3>
+        <hr />
+        <ul>
+          <li v-for="item in list" :key="item">{{item}}</li>
+        </ul>
+        <button @click="add">Add</button>
+      </div>
+    `;
+
+  const render = function render(h) {
+    const vnode = h("div", [
+      h("h1", this.age),
+      h(
+        "button",
+        {
+          on: {
+            click: () => {
+              this.age++;
+            },
+          },
+          class: "dv",
+        },
+        "Add"
+      ),
+      h(uiChild, {
+        on: {
+          "@cus-click": this.increment,
+          "hook:created": this.handle,
+        },
+      }),
+    ]);
+    // console.log(vnode);
+    return vnode;
+  };
+
+  const app = new Vue({
+    el: "#app",
+    provide: {
+      foo: "父组件的provide foo",
+    },
+    template,
+    // render,
+    data: {
+      age: 12,
+      fullName: {
+        first: "jack",
+        last: "Mr",
+      },
+      a: {
+        b: {
+          c: 3,
+        },
+      },
+      list: [1, 2, 3],
+    },
+    computed: {
+      info() {
+        return this.age + 23;
+      },
+    },
+    methods: {
+      add() {
+        this.list[1] = 4; // 无效
+        // this.$set(this.list, 1, 4);
+        // this.age++;
+      },
+      increment() {
+        console.log(1);
+      },
+      handle() {
+        // console.log("监听到子组件的created");
+      },
+    },
+    watch: {
+      age(newVal, oldVal) {
+        console.log("newVal, oldVal", newVal, oldVal);
+      },
+      "a.b.c"() {},
+    },
+  });
+
+  console.log(app);
+</script>
+
+<script>
+  // const app = new Vue({
+  //   data: {
+  //     age: 12,
+  //     fullName: {
+  //       first: "jack",
+  //       last: "Mr",
+  //     },
+  //   },
+  //   render(h) {
+  //     return h("div", [
+  //       h("h1", this.age),
+  //       h("h1", this.fullName.first),
+  //       h("h1", this.fullName.last),
+  //     ]);
+  //   },
+  // });
+</script>
