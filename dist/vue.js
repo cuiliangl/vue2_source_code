@@ -956,7 +956,7 @@
 
     // 添加 __ob__ 属性 值为 this（observer实例） 相互引用 这样就把value 和 observer 关联起来了
     // __ob__ 必须定义成不可枚举的，否则会陷入死循环。因为observer 和 value 是相互引用的。
-    def(value, "__ob__", this);
+    def(value, '__ob__', this);
 
     // 数组
     if (Array.isArray(value)) {
@@ -1007,11 +1007,11 @@
 
   function observe(value, asRootData) {
     if (!isObject(value) || value instanceof VNode) {
-      return;
+      return
     }
     var ob;
 
-    if (hasOwn(value, "__ob__") && value.__ob__ instanceof Observer) {
+    if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
       // 本身就是响应式对象
       ob = value.__ob__;
     } else if (
@@ -1031,7 +1031,7 @@
     }
 
     // 返回observer实例
-    return ob;
+    return ob
   }
 
   /**
@@ -1049,7 +1049,7 @@
     var property = Object.getOwnPropertyDescriptor(obj, key);
 
     if (property && property.configurable === false) {
-      return;
+      return
     }
 
     // cater for pre-defined getter/setters
@@ -1088,21 +1088,21 @@
           }
         }
 
-        return value;
+        return value
       },
       set: function reactiveSetter(newVal) {
         var value = getter ? getter.call(obj) : val;
 
         /* eslint-disable no-self-compare */ // NaN的情况
         if (newVal === value || (newVal !== newVal && value !== value)) {
-          return;
+          return
         }
         /* eslint-enable no-self-compare */
         if (customSetter) {
           customSetter();
         }
 
-        if (getter && !setter) { return; }
+        if (getter && !setter) { return }
         if (setter) {
           setter.call(obj, newVal);
         } else {
@@ -1113,7 +1113,7 @@
         childOb = !shallow && observe(newVal);
         // 派发更新
         dep.notify();
-      },
+      }
     });
   }
 
@@ -1136,13 +1136,13 @@
 
       // 会触发重写的splice 内部会对值做响应式处理
       target.splice(key, 1, val);
-      return val;
+      return val
     }
 
     // 对象上已经存在的属性，其实就是修改值的操作
     if (key in target && !(key in Object.prototype)) {
       target[key] = val;
-      return val;
+      return val
     }
     // $flow-disable-line
     var ob = target.__ob__; // 获取targer对应的observer实例
@@ -1151,13 +1151,13 @@
     if (target._isVue /* vm */ || (ob && ob.vmCount) /* $data */) {
       // 不允许直接修改 vm上的属性 或 直接修改 $data
       warn();
-      return val;
+      return val
     }
 
     // 如果target是非响应式对象 只修改值
     if (!ob) {
       target[key] = val;
-      return val;
+      return val
     }
 
     // 否则对新属性开启响应式
@@ -1165,7 +1165,7 @@
 
     // 手动触发组件的更新
     ob.dep.notify();
-    return val;
+    return val
   }
 
   /**
@@ -1181,7 +1181,7 @@
     // 数组
     if (Array.isArray(target) && isValidArrayIndex(key)) {
       target.splice(key, 1);
-      return;
+      return
     }
 
     // $flow-disable-line
@@ -1190,16 +1190,16 @@
     // vm 或 $data
     if (target._isVue || (ob && ob.vmCount)) {
       warn();
-      return;
+      return
     }
     if (!hasOwn(target, key)) {
-      return;
+      return
     }
 
     delete target[key];
 
     if (!ob) {
-      return;
+      return
     }
     // 如果是响应式数据，需要通知更新视图
     ob.dep.notify();
@@ -4134,7 +4134,7 @@
     activeInstance = vm;
     return function () {
       activeInstance = prevActiveInstance;
-    };
+    }
   }
 
   // 初始化实例
@@ -4157,6 +4157,7 @@
     vm.$children = [];
     vm.$refs = {};
 
+    // 挂载时，创建watcher的时候根据 isRenderWatcher 参数判断是否是组件watcher
     vm._watcher = null;
     vm._inactive = null;
     vm._directInactive = false;
@@ -4211,7 +4212,7 @@
       // 每个组件都有一个 _watcher
       var vm = this;
       if (vm._watcher) {
-        // 会重新执行 updateComponent 方法
+        // 重新执行 updateComponent 方法
         vm._watcher.update();
       }
     };
@@ -4220,22 +4221,24 @@
     Vue.prototype.$destroy = function () {
       var vm = this;
       if (vm._isBeingDestroyed) {
-        return;
+        return
       }
-      callHook(vm, "beforeDestroy");
+      callHook(vm, 'beforeDestroy');
       vm._isBeingDestroyed = true;
       var parent = vm.$parent;
 
       if (parent && !parent._isBeingDestroyed && !vm.$options.abstract) {
-        // 从父组件中移除自身
+        // 从父组件的子组件列表中移除自身
         remove(parent.$children, vm);
       }
+
       // teardown watchers
       // 渲染watcher
       if (vm._watcher) {
         vm._watcher.teardown();
       }
 
+      // 组件实例化时所有通过 vm.$watch() 创建的watcher
       var i = vm._watchers.length;
       while (i--) {
         vm._watchers[i].teardown();
@@ -4255,7 +4258,7 @@
       vm.__patch__(vm._vnode, null);
 
       // fire destroyed hook
-      callHook(vm, "destroyed");
+      callHook(vm, 'destroyed');
 
       vm.$off(); // 清除所有自定义事件
 
@@ -4283,19 +4286,19 @@
       {
         /* istanbul ignore if */
         if (
-          (vm.$options.template && vm.$options.template.charAt(0) !== "#") ||
+          (vm.$options.template && vm.$options.template.charAt(0) !== '#') ||
           vm.$options.el ||
           el
         ) {
           warn(
-            "You are using the runtime-only build of Vue where the template " +
-              "compiler is not available. Either pre-compile the templates into " +
-              "render functions, or use the compiler-included build.",
+            'You are using the runtime-only build of Vue where the template ' +
+              'compiler is not available. Either pre-compile the templates into ' +
+              'render functions, or use the compiler-included build.',
             vm
           );
         } else {
           warn(
-            "Failed to mount component: template or render function not defined.",
+            'Failed to mount component: template or render function not defined.',
             vm
           );
         }
@@ -4303,7 +4306,7 @@
     }
 
     // 先执行 beforeMounte 后执行 render
-    callHook(vm, "beforeMount");
+    callHook(vm, 'beforeMount');
 
     var updateComponent;
     /* istanbul ignore if */
@@ -4338,11 +4341,12 @@
       noop,
       {
         before: function before() {
+          // console.log('component watcher')
           // 已经挂载并且没有销毁，说明是更新组件
           if (vm._isMounted && !vm._isDestroyed) {
-            callHook(vm, "beforeUpdate");
+            callHook(vm, 'beforeUpdate');
           }
-        },
+        }
       },
       true /* isRenderWatcher */
     );
@@ -4353,9 +4357,9 @@
       vm._isMounted = true;
       // 调用根组件的钩子
       // 挂载根组件
-      callHook(vm, "mounted");
+      callHook(vm, 'mounted');
     }
-    return vm;
+    return vm
   }
 
   function updateChildComponent(
@@ -4442,26 +4446,26 @@
 
   function isInInactiveTree(vm) {
     while (vm && (vm = vm.$parent)) {
-      if (vm._inactive) { return true; }
+      if (vm._inactive) { return true }
     }
-    return false;
+    return false
   }
 
   function activateChildComponent(vm, direct) {
     if (direct) {
       vm._directInactive = false;
       if (isInInactiveTree(vm)) {
-        return;
+        return
       }
     } else if (vm._directInactive) {
-      return;
+      return
     }
     if (vm._inactive || vm._inactive === null) {
       vm._inactive = false;
       for (var i = 0; i < vm.$children.length; i++) {
         activateChildComponent(vm.$children[i]);
       }
-      callHook(vm, "activated");
+      callHook(vm, 'activated');
     }
   }
 
@@ -4469,7 +4473,7 @@
     if (direct) {
       vm._directInactive = true;
       if (isInInactiveTree(vm)) {
-        return;
+        return
       }
     }
     if (!vm._inactive) {
@@ -4477,7 +4481,7 @@
       for (var i = 0; i < vm.$children.length; i++) {
         deactivateChildComponent(vm.$children[i]);
       }
-      callHook(vm, "deactivated");
+      callHook(vm, 'deactivated');
     }
   }
 
@@ -4501,7 +4505,7 @@
     }
     // 应用场景：父组件监听子组件的生命周期 <Child @hook:created="handle" />
     if (vm._hasHookEvent) {
-      vm.$emit("hook:" + hook);
+      vm.$emit('hook:' + hook);
     }
     popTarget();
   }
@@ -4550,8 +4554,8 @@
     var performance = window.performance;
     if (
       performance &&
-      typeof performance.now === "function" &&
-      getNow() > document.createEvent("Event").timeStamp
+      typeof performance.now === 'function' &&
+      getNow() > document.createEvent('Event').timeStamp
     ) {
       // if the event timestamp, although evaluated AFTER the Date.now(), is
       // smaller than it, it means the event is using a hi-res timestamp,
@@ -4601,13 +4605,13 @@
         circular[id] = (circular[id] || 0) + 1;
         if (circular[id] > MAX_UPDATE_COUNT) {
           warn(
-            "You may have an infinite update loop " +
+            'You may have an infinite update loop ' +
               (watcher.user
                 ? ("in watcher with expression \"" + (watcher.expression) + "\"")
                 : "in a component render function."),
             watcher.vm
           );
-          break;
+          break
         }
       }
     }
@@ -4626,7 +4630,7 @@
     // devtool hook
     /* istanbul ignore if */
     if (devtools && config.devtools) {
-      devtools.emit("flush");
+      devtools.emit('flush');
     }
   }
 
@@ -4637,7 +4641,7 @@
       var watcher = queue[i];
       var vm = watcher.vm;
       if (vm._watcher === watcher && vm._isMounted && !vm._isDestroyed) {
-        callHook(vm, "updated");
+        callHook(vm, 'updated');
       }
     }
   }
@@ -4678,7 +4682,7 @@
       if (!flushing) {
         queue.push(watcher);
       } else {
-        // 处理执行队列中的watcher 过程中产生的新的watcher
+        // 处理执行队列中的watcher时 又产生的新watcher
         /**
          * 原则：从后往前找，找到第一个待插入 watcher 的 id 比当前队列中 watcher 的 id 大的位置。把 watcher 按照 id的插入到队列中，因此 queue 的长度会发生变化。
          * 如果新的 watcher id 比 后面的id 小，则继续向前移动指针，插入到当前的 watcher 后面，下一次 for 时就会执行新插入的 watcher
@@ -4696,7 +4700,7 @@
 
         if (!config.async) {
           flushSchedulerQueue();
-          return;
+          return
         }
         // 下一轮事件循环执行
         nextTick(flushSchedulerQueue);
@@ -4758,7 +4762,7 @@
       expOrFn.toString();
 
     // expOrFn支持函数
-    if (typeof expOrFn === "function") {
+    if (typeof expOrFn === 'function') {
       this.getter = expOrFn;
     } else {
       this.getter = parsePath(expOrFn);
@@ -4767,8 +4771,8 @@
         this.getter = noop;
         warn(
             "Failed watching path: \"" + expOrFn + "\" " +
-              "Watcher only accepts simple dot-delimited paths. " +
-              "For full control, use a function instead.",
+              'Watcher only accepts simple dot-delimited paths. ' +
+              'For full control, use a function instead.',
             vm
           );
       }
@@ -4796,7 +4800,7 @@
       if (this.user) {
         handleError(e, vm, ("getter for watcher \"" + (this.expression) + "\""));
       } else {
-        throw e;
+        throw e
       }
     } finally {
       // 递归访问value，触发所有子项的getter，将当前watcher都添加到所有属性对应的dep中。
@@ -4808,7 +4812,7 @@
       // 清理依赖收集
       this.cleanupDeps();
     }
-    return value;
+    return value
   };
 
   /**
@@ -4946,12 +4950,12 @@
    */
   Watcher.prototype.teardown = function teardown () {
     if (this.active) {
-      // remove self from vm's watcher list
-      // this is a somewhat expensive operation so we skip it
-      // if the vm is being destroyed.
       if (!this.vm._isBeingDestroyed) {
+        // 把组件watcher从组件实例的所有watcher列表中移除
         remove(this.vm._watchers, this);
       }
+
+      // 移除组件中每个状态的依赖watcher
       var i = this.deps.length;
       while (i--) {
         this.deps[i].removeSub(this);
@@ -4971,13 +4975,13 @@
     enumerable: true,
     configurable: true,
     get: noop,
-    set: noop,
+    set: noop
   };
 
   // 代理到实例上
   function proxy(target, sourceKey, key) {
     sharedPropertyDefinition.get = function proxyGetter() {
-      return this[sourceKey][key];
+      return this[sourceKey][key]
     };
     sharedPropertyDefinition.set = function proxySetter(val) {
       this[sourceKey][key] = val;
@@ -4986,6 +4990,7 @@
   }
 
   function initState(vm) {
+    // 收集所有watcher
     vm._watchers = [];
 
     var opts = vm.$options;
@@ -5079,12 +5084,12 @@
   // 初始化data
   function initData(vm) {
     var data = vm.$options.data;
-    data = vm._data = typeof data === "function" ? getData(data, vm) : data || {};
+    data = vm._data = typeof data === 'function' ? getData(data, vm) : data || {};
     if (!isPlainObject(data)) {
       data = {};
       warn(
-          "data functions should return an object:\n" +
-            "https://vuejs.org/v2/guide/components.html#data-Must-Be-a-Function",
+          'data functions should return an object:\n' +
+            'https://vuejs.org/v2/guide/components.html#data-Must-Be-a-Function',
           vm
         );
     }
@@ -5099,10 +5104,7 @@
       var key = keys[i];
       {
         if (methods && hasOwn(methods, key)) {
-          warn(
-            ("Method \"" + key + "\" has already been defined as a data property."),
-            vm
-          );
+          warn(("Method \"" + key + "\" has already been defined as a data property."), vm);
         }
       }
       if (props && hasOwn(props, key)) {
@@ -5123,10 +5125,10 @@
     pushTarget();
     try {
       // data函数接受参数 vm
-      return data.call(vm, vm);
+      return data.call(vm, vm)
     } catch (e) {
       handleError(e, vm, "data()");
-      return {};
+      return {}
     } finally {
       popTarget();
     }
@@ -5145,7 +5147,7 @@
 
     for (var key in computed) {
       var userDef = computed[key];
-      var getter = typeof userDef === "function" ? userDef : userDef.get;
+      var getter = typeof userDef === 'function' ? userDef : userDef.get;
       if (getter == null) {
         warn(("Getter is missing for computed property \"" + key + "\"."), vm);
       }
@@ -5167,10 +5169,7 @@
         if (key in vm.$data) {
           warn(("The computed property \"" + key + "\" is already defined in data."), vm);
         } else if (vm.$options.props && key in vm.$options.props) {
-          warn(
-            ("The computed property \"" + key + "\" is already defined as a prop."),
-            vm
-          );
+          warn(("The computed property \"" + key + "\" is already defined as a prop."), vm);
         } else if (vm.$options.methods && key in vm.$options.methods) {
           warn(
             ("The computed property \"" + key + "\" is already defined as a method."),
@@ -5189,7 +5188,7 @@
     var shouldCache = !isServerRendering();
 
     // 计算属性 key 挂载到 vm 上的访问器对象 get 和 set
-    if (typeof userDef === "function") {
+    if (typeof userDef === 'function') {
       sharedPropertyDefinition.get = shouldCache
         ? createComputedGetter(key)
         : createGetterInvoker(userDef);
@@ -5230,22 +5229,22 @@
         if (Dep.target) {
           watcher.depend();
         }
-        return watcher.value;
+        return watcher.value
       }
-    };
+    }
   }
 
   function createGetterInvoker(fn) {
     return function computedGetter() {
-      return fn.call(this, this);
-    };
+      return fn.call(this, this)
+    }
   }
 
   function initMethods(vm, methods) {
     var props = vm.$options.props;
     for (var key in methods) {
       {
-        if (typeof methods[key] !== "function") {
+        if (typeof methods[key] !== 'function') {
           warn(
             "Method \"" + key + "\" has type \"" + (typeof methods[
               key
@@ -5266,8 +5265,7 @@
       }
 
       // 绑定到实例上
-      vm[key] =
-        typeof methods[key] !== "function" ? noop : bind(methods[key], vm);
+      vm[key] = typeof methods[key] !== 'function' ? noop : bind(methods[key], vm);
     }
   }
 
@@ -5299,11 +5297,11 @@
     }
 
     // handler 为 methods中定义的方法
-    if (typeof handler === "string") {
+    if (typeof handler === 'string') {
       handler = vm[handler];
     }
 
-    return vm.$watch(expOrFn, handler, options);
+    return vm.$watch(expOrFn, handler, options)
   }
 
   function stateMixin(Vue) {
@@ -5312,21 +5310,21 @@
     // $data
     var dataDef = {};
     dataDef.get = function () {
-      return this._data;
+      return this._data
     };
 
     // $props
     var propsDef = {};
     propsDef.get = function () {
-      return this._props;
+      return this._props
     };
 
     // 禁止直接修改 $data 和 $props
     {
       dataDef.set = function () {
         warn(
-          "Avoid replacing instance root $data. " +
-            "Use nested data properties instead.",
+          'Avoid replacing instance root $data. ' +
+            'Use nested data properties instead.',
           this
         );
       };
@@ -5335,8 +5333,8 @@
       };
     }
 
-    Object.defineProperty(Vue.prototype, "$data", dataDef);
-    Object.defineProperty(Vue.prototype, "$props", propsDef);
+    Object.defineProperty(Vue.prototype, '$data', dataDef);
+    Object.defineProperty(Vue.prototype, '$props', propsDef);
 
     Vue.prototype.$set = set;
     Vue.prototype.$delete = del;
@@ -5350,7 +5348,7 @@
       var vm = this;
 
       if (isPlainObject(cb)) {
-        return createWatcher(vm, expOrFn, cb, options);
+        return createWatcher(vm, expOrFn, cb, options)
       }
       options = options || {};
       options.user = true;
@@ -5365,7 +5363,7 @@
       }
       return function unwatchFn() {
         watcher.teardown();
-      };
+      }
     };
   }
 
