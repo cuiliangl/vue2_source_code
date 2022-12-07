@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="../../dist/vue.js"></script>
+  </head>
+  <body>
+    <div id="tpl">
+      <ul>
+        <li v-for="item in list" :key="item">{{item}}</li>
+      </ul>
+      <button @click="change">click</button>
+    </div>
+
+    <div id="app">
+      <mi-cui> nihao </mi-cui>
+    </div>
+  </body>
+</html>
+
+<script>
+  const app = new Vue({
+    el: document.getElementById('tpl'),
+    components: {
+      'mi-cui': {
+        template: ` <div>
+            <slot />
+        </div>`
+      }
+    },
+    data: {
+      list: [1, 2, 3, 4]
+    },
+    methods: {
+      change() {
+        // 无效
+        // vue底层没有对元素类型为基本值的数组进行观测，也不会检测 length 属性
+        this.list[2] = 555
+        this.list.length = 444
+        console.log(this.list)
+      }
+    }
+  })
+</script>

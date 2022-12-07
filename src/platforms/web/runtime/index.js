@@ -27,6 +27,7 @@ Vue.config.getTagNamespace = getTagNamespace
 Vue.config.isUnknownElement = isUnknownElement
 
 // install platform runtime directives & components
+// 设置平台对应的组件和指令
 extend(Vue.options.directives, platformDirectives)
 extend(Vue.options.components, platformComponents)
 
@@ -55,19 +56,20 @@ if (inBrowser) {
       ) {
         console[console.info ? 'info' : 'log'](
           'Download the Vue Devtools extension for a better development experience:\n' +
-          'https://github.com/vuejs/vue-devtools'
+            'https://github.com/vuejs/vue-devtools'
         )
       }
     }
-    if (process.env.NODE_ENV !== 'production' &&
+    if (
+      process.env.NODE_ENV !== 'production' &&
       process.env.NODE_ENV !== 'test' &&
       config.productionTip !== false &&
       typeof console !== 'undefined'
     ) {
       console[console.info ? 'info' : 'log'](
         `You are running Vue in development mode.\n` +
-        `Make sure to turn on production mode when deploying for production.\n` +
-        `See more tips at https://vuejs.org/guide/deployment.html`
+          `Make sure to turn on production mode when deploying for production.\n` +
+          `See more tips at https://vuejs.org/guide/deployment.html`
       )
     }
   }, 0)
